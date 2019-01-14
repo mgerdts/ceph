@@ -29,7 +29,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 
-#if defined(__FreeBSD__) || defined(__sun___)
+#if defined(__FreeBSD__) || defined(__sun__)
 #define XATTR_CREATE    0x1
 #define XATTR_REPLACE   0x2
 #else

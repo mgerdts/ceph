@@ -410,15 +410,6 @@ if(NOT APPLE AND NOT FREEBSD)
     PROPERTY LINK_FLAGS "-Wl,-Bsymbolic")
 endif()
 
-if(__SUNOS_COMPILER_GNU)
-  # While compiling various things that use boost, we need to compile with
-  # -pthreads on illumos.
-  set_property(
-    TARGET ceph-common
-    APPEND APPEND_STRING
-    PROPERTY COMPILE_FLAGS "-pthreads")
-endif()
-
 install(
   TARGETS ceph-common
   LIBRARY
@@ -439,15 +430,6 @@ add_subdirectory(cls)
 
 # RADOS client/library
 add_subdirectory(osdc)
-
-if(__SUNOS_COMPILER_GNU)
-  # While compiling various things that use boost, we need to compile with
-  # -pthreads on illumos.
-  set_property(
-    TARGET osdc
-    APPEND APPEND_STRING
-    PROPERTY COMPILE_FLAGS "-pthreads")
-endif()
 
 # heal_profiler
 add_subdirectory(perfglue)

@@ -13,6 +13,13 @@
  *
  */
 
+#ifdef __sun__
+struct bogus_map;
+#define map bogus_map
+#include <net/if.h>
+#undef map
+#endif
+
 #include "common/ceph_context.h"
 
 #include <mutex>

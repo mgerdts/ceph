@@ -15,7 +15,7 @@
 #include "acconfig.h"
 #include <sys/types.h>
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(__sun__)
 #define PROCPREFIX
 #endif
 
@@ -38,6 +38,7 @@
 
 #endif /* __FreeBSD__ */
 
+// XXX-mg anything for illumos here?  ENODATA is 61, which is ENOATTR.
 #if defined(__APPLE__) || defined(__FreeBSD__)
 /* Make sure that ENODATA is defined in the correct way */
 #ifdef ENODATA

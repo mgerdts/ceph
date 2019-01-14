@@ -99,6 +99,10 @@ set(common_srcs
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/common/version.cc
   APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_BINARY_DIR}/src/include/ceph_ver.h)
 
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/osdc/Objecter.cc
+  APPEND APPEND_STRING
+  PROPERTY COMPILE_FLAGS "-pthreads")
+
 if(HAS_VTA)
   set_source_files_properties(
     config.cc

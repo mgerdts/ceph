@@ -12,6 +12,13 @@
  * 
  */
 
+#ifdef __sun__
+struct bogus_map;
+#define map bogus_map
+#include <net/if.h>
+#undef map
+#endif
+
 #include "common/LogClient.h"
 #include "include/str_map.h"
 #include "messages/MLog.h"

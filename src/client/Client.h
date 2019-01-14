@@ -44,6 +44,10 @@
 #include <set>
 #include <string>
 
+#ifdef __sun__
+#undef rewinddir
+#endif
+
 using std::set;
 using std::map;
 using std::fstream;

@@ -8,6 +8,7 @@ export LD_RUN_PATH=/opt/local/lib
 #export CFLAGS="-m64"
 export LDFLAGS="-L/opt/local/lib -L/usr/lib/mps/64"
 export CPPFLAGS="-I/opt/local"
+export CXX_FLAGS=-pthreads
 
 if [ x"$1"x = x"--deps"x ]; then
     sudo ./install-deps.sh
@@ -28,7 +29,7 @@ COMPILE_FLAGS="-O0 -g"
 #    # We need to use the llvm linker for linking ceph-dencoder
 #    COMPILE_FLAGS="$COMPILE_FLAGS -fuse-ld=/usr/bin/ld.lld"
 #fi
-CMAKE_CXX_FLAGS_DEBUG="$CXX_FLAGS_DEBUG $COMPILE_FLAGS"
+CMAKE_CXX_FLAGS_DEBUG="$CXX_FLAGS $CXX_FLAGS_DEBUG $COMPILE_FLAGS"
 CMAKE_C_FLAGS_DEBUG="$C_FLAGS_DEBUG $COMPILE_FLAGS"
 
 #
@@ -38,6 +39,7 @@ CMAKE_C_FLAGS_DEBUG="$C_FLAGS_DEBUG $COMPILE_FLAGS"
 rm -rf build
 
 ./do_cmake.sh "$*" \
+	-D CXX_FLAGS="$CXX_FLAGS" \
 	-D WITH_CCACHE=ON \
 	-D CMAKE_BUILD_TYPE=Debug \
 	-D CMAKE_CXX_FLAGS_DEBUG="$CXX_FLAGS_DEBUG" \

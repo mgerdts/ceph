@@ -1,3 +1,10 @@
+#ifdef __sun__
+struct bogus_map;
+#define map bogus_map
+#include <net/if.h>
+#undef map
+#endif
+
 #include "svc_rados.h"
 
 #include "include/rados/librados.hpp"

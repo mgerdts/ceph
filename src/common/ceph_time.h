@@ -175,7 +175,10 @@ namespace ceph {
 #else
 	// And if we find neither, you may wish to consult your system's
 	// documentation.
+#ifndef __sun__
+	// XXX-mg tired of the noise
 #warning Falling back to CLOCK_REALTIME, may be slow.
+#endif
 	clock_gettime(CLOCK_REALTIME, &ts);
 #endif
 	return from_timespec(ts);
@@ -280,9 +283,12 @@ namespace ceph {
 #elif defined(CLOCK_MONOTONIC_FAST)
 	// BSD systems have _FAST clocks.
 	clock_gettime(CLOCK_MONOTONIC_FAST, &ts);
+#elif defined(CLOCK_HIGHRES)
+	// Solaris has something similar to CLOCK_MONOTONIC_FAST
+	clock_gettime(CLOCK_HIGHRES, &ts);
 #else
-	// And if we find neither, you may wish to consult your system's
-	// documentation.
+	// And if we find none of the above, you may wish to consult your
+	// system's documentation.
 #warning Falling back to CLOCK_MONOTONIC, may be slow.
 	clock_gettime(CLOCK_MONOTONIC, &ts);
 #endif

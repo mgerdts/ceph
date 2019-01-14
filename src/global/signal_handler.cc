@@ -113,6 +113,7 @@ static void reraise_fatal(int signum)
 // get_from_os_release("FOO=bar\nTHIS=\"that\"\n", "FOO=", ...) will
 // write "bar\0" to out buffer, which is assumed to be as large as the input
 // file.
+#if defined(__linux__)
 static int parse_from_os_release(
   const char *file, const char *key,
   char *out)
@@ -137,6 +138,7 @@ static int parse_from_os_release(
   out[end - start] = 0;
   return 0;
 }
+#endif
 
 static void handle_fatal_signal(int signum)
 {

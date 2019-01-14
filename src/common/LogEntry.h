@@ -120,7 +120,7 @@ WRITE_CLASS_ENCODER_FEATURES(LogEntry)
 struct LogSummary {
   version_t version;
   // channel -> [(seq#, entry), ...]
-  map<string,list<pair<uint64_t,LogEntry>>> tail_by_channel;
+  std::map<string,list<pair<uint64_t,LogEntry>>> tail_by_channel;
   uint64_t seq = 0;
   ceph::unordered_set<LogEntryKey> keys;
 
