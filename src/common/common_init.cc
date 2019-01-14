@@ -97,6 +97,10 @@ void complain_about_parse_errors(CephContext *cct,
 
 #ifndef WITH_SEASTAR
 
+#ifndef ACCESSPERMS
+#define ACCESSPERMS (S_IRWXU|S_IRWXG|S_IRWXO)
+#endif
+
 /* Please be sure that this can safely be called multiple times by the
  * same application. */
 void common_init_finish(CephContext *cct)

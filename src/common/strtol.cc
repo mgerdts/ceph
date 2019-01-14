@@ -278,16 +278,16 @@ T strict_si_cast(std::string_view str, std::string *err)
   }
   using promoted_t = typename std::common_type<decltype(ll), T>::type;
   if (static_cast<promoted_t>(ll) <
-      static_cast<promoted_t>(std::numeric_limits<T>::min()) / pow (10, m)) {
+      static_cast<promoted_t>(std::numeric_limits<T>::min()) / pow (10.0f, m)) {
     *err = "strict_sistrtoll: value seems to be too small";
     return 0;
   }
   if (static_cast<promoted_t>(ll) >
-      static_cast<promoted_t>(std::numeric_limits<T>::max()) / pow (10, m)) {
+      static_cast<promoted_t>(std::numeric_limits<T>::max()) / ::pow (10.0f, m)) {
     *err = "strict_sistrtoll: value seems to be too large";
     return 0;
   }
-  return (ll * pow (10,  m));
+  return (ll * pow (10.0f,  m));
 }
 
 template int strict_si_cast<int>(std::string_view str, std::string *err);

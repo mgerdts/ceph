@@ -1,6 +1,8 @@
 // -*- mode:C++; tab-width:8; c-basic-offset:2; indent-tabs-mode:t -*-
 // vim: ts=8 sw=2 smarttab
 
+#ifndef __sun__
+
 #include "numa.h"
 
 #include <cstring>
@@ -137,3 +139,5 @@ int get_numa_node_cpu_set(
   ::close(fd);
   return r;
 }
+
+#endif // __sun__

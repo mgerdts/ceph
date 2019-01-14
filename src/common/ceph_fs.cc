@@ -76,7 +76,10 @@ int ceph_flags_sys2wire(int flags)
        ceph_sys2wire(O_CREAT);
        ceph_sys2wire(O_EXCL);
        ceph_sys2wire(O_TRUNC);
+#ifndef __sun__
+       // XXX-mg think about this one
        ceph_sys2wire(O_DIRECTORY);
+#endif
        ceph_sys2wire(O_NOFOLLOW);
 
 #undef ceph_sys2wire

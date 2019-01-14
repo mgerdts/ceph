@@ -18,7 +18,9 @@
 #include "common/config_obs.h"
 #include "common/debug.h"
 #include "common/errno.h"
+#ifndef __sun__
 #include "common/numa.h"
+#endif
 
 #include <netdb.h>
 

@@ -29,7 +29,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/fusion/include/std_pair.hpp>
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__sun___)
 #define XATTR_CREATE    0x1
 #define XATTR_REPLACE   0x2
 #else
@@ -7839,7 +7839,7 @@ void Client::fill_dirent(struct dirent *de, const char *name, int type, uint64_t
   de->d_name[255] = '\0';
 #ifndef __CYGWIN__
   de->d_ino = ino;
-#if !defined(__APPLE__) && !defined(__FreeBSD__)
+#if !defined(__APPLE__) && !defined(__FreeBSD__) && !defined(__sun__)
   de->d_off = next_off;
 #endif
   de->d_reclen = 1;

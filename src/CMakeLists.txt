@@ -40,11 +40,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL GNU)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-new-ttp-matching")
   # cmake does not add '-pie' for executables even if
   # CMAKE_POSITION_INDEPENDENT_CODE is TRUE.
-  if(EXE_LINKER_USE_PIE)
-    if (NOT WITH_OSD_INSTRUMENT_FUNCTIONS AND NOT HAVE_SEASTAR)
-      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pie")
-    endif()
-  endif()
+  # if(EXE_LINKER_USE_PIE)
+  #   if (NOT WITH_OSD_INSTRUMENT_FUNCTIONS AND NOT HAVE_SEASTAR)
+  #     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pie")
+  #   endif()
+  # endif()
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_EXPORTS_C_FLAG}")
   set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -rdynamic -export-dynamic ${CMAKE_EXE_EXPORTS_C_FLAG}")
@@ -403,10 +403,20 @@ if(NOT APPLE AND NOT FREEBSD)
   # with the same name, instead of using the one defined in libceph-common.
   # in other words, we require libceph-common to use local symbols, even if redefined
   # in application".
+  # XXX-mg hack below breaks linux?
   set_property(
     TARGET ceph-common
     APPEND APPEND_STRING
-    PROPERTY LINK_FLAGS "-Wl,-Bsymbolic -Wl,-Bsymbolic-functions")
+    PROPERTY LINK_FLAGS "-Wl,-Bsymbolic")
+endif()
+
+if(__SUNOS_COMPILER_GNU)
+  # While compiling various things that use boost, we need to compile with
+  # -pthreads on illumos.
+  set_property(
+    TARGET ceph-common
+    APPEND APPEND_STRING
+    PROPERTY COMPILE_FLAGS "-pthreads")
 endif()
 
 install(
@@ -429,6 +439,15 @@ add_subdirectory(cls)
 
 # RADOS client/library
 add_subdirectory(osdc)
+
+if(__SUNOS_COMPILER_GNU)
+  # While compiling various things that use boost, we need to compile with
+  # -pthreads on illumos.
+  set_property(
+    TARGET osdc
+    APPEND APPEND_STRING
+    PROPERTY COMPILE_FLAGS "-pthreads")
+endif()
 
 # heal_profiler
 add_subdirectory(perfglue)

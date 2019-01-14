@@ -21,7 +21,11 @@
 #include "common/errno.h"
 #include "common/version.h"
 
-#ifdef HAVE_SYS_VFS_H
+// XXX-mg change to using this use HAVE_STATVFS
+#ifdef __sun__
+#include <sys/types.h>
+#include <sys/statvfs.h>
+#elif defined (HAVE_SYS_VFS_H)
 #include <sys/vfs.h>
 #endif
 
@@ -43,8 +47,14 @@ int get_fs_stats(ceph_data_stats_t &stats, const char *path)
   if (!path)
     return -EINVAL;
 
+  int err;
+#ifdef __sun__
+  struct statvfs stbuf;
+  err = statvfs(path, &stbuf);
+#else
   struct statfs stbuf;
-  int err = ::statfs(path, &stbuf);
+  err = ::statfs(path, &stbuf);
+#endif
   if (err < 0) {
     return -errno;
   }
@@ -202,6 +212,10 @@ void collect_sys_info(map<string, string> *m, CephContext *cct)
       (*m)["cpu"] = buf;
     }
   }
+#elif defined(__sun__)
+  (*m)["mem_total_kb"] = "not implemented";
+  (*m)["mem_swap_kb"] = "not implemented";
+  (*m)["cpu"] = "not implemented";
 #else
   // memory
   FILE *f = fopen(PROCPREFIX "/proc/meminfo", "r");

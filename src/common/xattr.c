@@ -22,6 +22,12 @@
 #elif defined(__APPLE__)
 #include <errno.h>
 #include <sys/xattr.h>
+#elif defined(__sun__)
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
 #else
 #error "Your system is not supported!"
 #endif
@@ -47,6 +53,21 @@ ceph_os_setxattr(const char *path, const char *name,
 	error = setxattr(path, name, value, size, 0);
 #elif defined(__APPLE__)
 	error = setxattr(path, name, value, size, 0 /* position */, 0);
+#elif defined(__sun__)
+	int fd = 1;
+	int atfd = -1;
+	int save_errno = 0;
+	if ((fd = open(path, O_RDONLY)) < 0 ||
+	    (atfd = openat(fd, name, O_WRONLY | O_XATTR)) < 0 ||
+	    write(atfd, value, size) != size) {
+		save_errno = errno;
+		error = -1;
+	}
+	if (fd != -1)
+		(void) close(fd);
+	if (atfd != -1)
+		(void) close(atfd);
+	errno = save_errno;
 #endif
 
 	return (error);
@@ -66,6 +87,17 @@ ceph_os_fsetxattr(int fd, const char *name, const void *value,
 	error = fsetxattr(fd, name, value, size, 0);
 #elif defined(__APPLE__)
 	error = fsetxattr(fd, name, value, size, 0, 0 /* no options should be identical to Linux */ );
+#elif defined(__sun__)
+	int atfd = -1;
+	int save_errno = 0;
+	if ((atfd = openat(fd, name, O_WRONLY | O_XATTR)) < 0 ||
+	    write(atfd, value, size) != size) {
+		save_errno = errno;
+		error = -1;
+	}
+	if (atfd != -1)
+		(void) close(atfd);
+	errno = save_errno;
 #endif
 
 	return (error);
@@ -101,6 +133,21 @@ void *value, size_t size)
 	/* ENOATTR and ENODATA have different values */
 	if (error < 0 && errno == ENOATTR)
 		errno = ENODATA;
+#elif defined(__sun__)
+	int fd = 1;
+	int atfd = -1;
+	int save_errno = 0;
+	if ((fd = open(path, O_RDONLY)) < 0 ||
+	    (atfd = openat(fd, name, O_RDONLY | O_XATTR)) < 0 ||
+	    (error = read(atfd, value, size)) < 0) {
+		save_errno = errno;
+		error = -1;
+	}
+	if (fd != -1)
+		(void) close(fd);
+	if (atfd != -1)
+		(void) close(atfd);
+	errno = save_errno;
 #endif
 
 	return (error);
@@ -136,6 +183,17 @@ ceph_os_fgetxattr(int fd, const char *name, void *value,
 	/* ENOATTR and ENODATA have different values */
 	if (error < 0 && errno == ENOATTR)
 		errno = ENODATA;
+#elif defined(__sun__)
+	int atfd = -1;
+	int save_errno = 0;
+	if ((atfd = openat(fd, name, O_RDONLY | O_XATTR)) < 0 ||
+	    (error = read(atfd, value, size)) < 0) {
+		save_errno = errno;
+		error = -1;
+	}
+	if (atfd != -1)
+		(void) close(atfd);
+	errno = save_errno;
 #endif
 
 	return (error);
@@ -185,6 +243,10 @@ ceph_os_listxattr(const char *path, char *list, size_t size)
 	error = listxattr(path, list, size);
 #elif defined(__APPLE__)
 	error = listxattr(path, list, size, 0);
+#elif defined(__sun__)
+	// XXX-mg implement
+	error = -1;
+	errno = ENOSYS;
 #endif
 
 	return (error);
@@ -234,6 +296,10 @@ ceph_os_flistxattr(int fd, char *list, size_t size)
 	error = flistxattr(fd, list, size);
 #elif defined(__APPLE__)
 	error = flistxattr(fd, list, size, 0);
+#elif defined(__sun__)
+	// XXX-mg implement
+	error = -1;
+	errno = ENOSYS;
 #endif
 
 	return (error);
@@ -253,6 +319,10 @@ ceph_os_removexattr(const char *path, const char *name)
 	/* ENOATTR and ENODATA have different values */
 	if (error < 0 && errno == ENOATTR)
 		errno = ENODATA;
+#elif defined(__sun__)
+	// XXX-mg implement
+	error = -1;
+	errno = ENOSYS;
 #endif
 
 	return (error);
@@ -272,6 +342,10 @@ ceph_os_fremovexattr(int fd, const char *name)
 	/* ENOATTR and ENODATA have different values */
 	if (error < 0 && errno == ENOATTR)
 		errno = ENODATA;
+#elif defined(__sun__)
+	// XXX-mg implement
+	error = -1;
+	errno = ENOSYS;
 #endif
 
 	return (error);

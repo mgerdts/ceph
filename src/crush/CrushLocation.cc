@@ -1,6 +1,13 @@
 // -*- mode:C++; tab-width:8; c-basic-offset:2; indent-tabs-mode:t -*-
 // vim: ts=8 sw=2 smarttab
 
+#ifdef __sun__
+#include <limits.h>
+#ifndef HOST_NAME_MAX
+#define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
+#endif
+#endif
+
 #include "include/compat.h"
 #include "CrushLocation.h"
 #include "CrushWrapper.h"

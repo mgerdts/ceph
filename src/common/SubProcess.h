@@ -17,7 +17,7 @@
 #ifndef SUB_PROCESS_H
 #define SUB_PROCESS_H
 
-#if defined(__FreeBSD__) || defined(__APPLE__)
+#if defined(__FreeBSD__) || defined(__APPLE__) || defined (__sun__)
 #include <signal.h>
 #endif
 

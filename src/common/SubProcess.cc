@@ -1,6 +1,6 @@
 #include "SubProcess.h"
 
-#if defined(__FreeBSD__) || defined(__APPLE__)
+#if defined(__FreeBSD__) || defined(__APPLE__) || defined(__sun__)
 #include <sys/types.h>
 #include <signal.h>
 #endif

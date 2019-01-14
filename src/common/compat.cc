@@ -26,6 +26,9 @@
 #if defined(__linux__) 
 #include <sys/vfs.h>
 #endif
+#ifdef __sun__
+#include <sys/stat.h>
+#endif
 
 #include "include/compat.h"
 #include "include/sock_compat.h"
@@ -60,9 +63,17 @@ int manual_fallocate(int fd, off_t offset, off_t len) {
 }
 
 int on_zfs(int basedir_fd) {
+#ifdef __sun__
+  struct stat stbuf;
+  if (fstat(basedir_fd, &stbuf) != 0) {
+    return (0);
+  }
+  return (strcmp(stbuf.st_fstype, "zfs") == 0);
+#else
   struct statfs basefs;
   (void)fstatfs(basedir_fd, &basefs);
   return (basefs.f_type == FS_ZFS_TYPE);
+#endif
 }
 
 int ceph_posix_fallocate(int fd, off_t offset, off_t len) {

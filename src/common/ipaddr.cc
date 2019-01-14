@@ -8,6 +8,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #endif
+#ifdef __sun__
+#include <alloca.h>
+#endif
 
 #include "include/ipaddr.h"
 #include "msg/msg_types.h"

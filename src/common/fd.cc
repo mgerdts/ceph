@@ -18,6 +18,10 @@
 
 void dump_open_fds(CephContext *cct)
 {
+#ifdef __sun__
+  lderr(cct) << "dump_open_fds not implemented" << dendl;
+  return;
+#else
 #ifdef __APPLE__
   const char *fn = "/dev/fd";
 #else
@@ -50,4 +54,5 @@ void dump_open_fds(CephContext *cct)
   lderr(cct) << "dump_open_fds dumped " << n << " open files" << dendl;
 
   closedir(d);
+#endif
 }

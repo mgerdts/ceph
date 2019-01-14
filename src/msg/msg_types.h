@@ -180,11 +180,13 @@ static inline void encode(const sockaddr_storage& a, bufferlist& bl) {
   struct sockaddr_storage ss = a;
   ss.ss_family = htons(ss.ss_family);
   ::encode_raw(ss, bl);
-#elif defined(__FreeBSD__) || defined(__APPLE__)
+#elif defined(__FreeBSD__) || defined(__APPLE__) || defined (__sun__)
   ceph_sockaddr_storage ss{};
   auto src = (unsigned char const *)&a;
   auto dst = (unsigned char *)&ss;
+#ifndef __sun__
   src += sizeof(a.ss_len);
+#endif
   ss.ss_family = a.ss_family;
   src += sizeof(a.ss_family);
   dst += sizeof(ss.ss_family);
@@ -203,13 +205,15 @@ static inline void decode(sockaddr_storage& a, bufferlist::const_iterator& bl) {
 #if defined(__linux__)
   ::decode_raw(a, bl);
   a.ss_family = ntohs(a.ss_family);
-#elif defined(__FreeBSD__) || defined(__APPLE__)
+#elif defined(__FreeBSD__) || defined(__APPLE__) || defined(__sun__)
   ceph_sockaddr_storage ss{};
   decode(ss, bl);
   auto src = (unsigned char const *)&ss;
   auto dst = (unsigned char *)&a;
+#ifndef __sun__
   a.ss_len = 0;
   dst += sizeof(a.ss_len);
+#endif
   a.ss_family = ss.ss_family;
   src += sizeof(ss.ss_family);
   dst += sizeof(a.ss_family);
@@ -265,7 +269,7 @@ struct entity_addr_t {
     type = o.type;
     nonce = o.nonce;
     memcpy(&u, &o.in_addr, sizeof(u));
-#if !defined(__FreeBSD__)
+#if !defined(__FreeBSD__) && !defined(__sun__)
     u.sa.sa_family = ntohs(u.sa.sa_family);
 #endif
   }
@@ -365,7 +369,7 @@ struct entity_addr_t {
     a.type = 0;
     a.nonce = nonce;
     a.in_addr = get_sockaddr_storage();
-#if !defined(__FreeBSD__)
+#if !defined(__FreeBSD__) && !defined(__sun__)
     a.in_addr.ss_family = htons(a.in_addr.ss_family);
 #endif
     return a;
@@ -471,7 +475,7 @@ struct entity_addr_t {
     __u32 elen = get_sockaddr_len();
     encode(elen, bl);
     if (elen) {
-#if (__FreeBSD__) || defined(__APPLE__)
+#if (__FreeBSD__) || defined(__APPLE__) && !defined(__sun__)
       __le16 ss_family = u.sa.sa_family;
       encode(ss_family, bl);
       bl.append(u.sa.sa_data,
@@ -498,7 +502,7 @@ struct entity_addr_t {
     __u32 elen;
     decode(elen, bl);
     if (elen) {
-#if defined(__FreeBSD__) || defined(__APPLE__)
+#if defined(__FreeBSD__) || defined(__APPLE__) && !defined(__sun__)
       u.sa.sa_len = 0;
       __le16 ss_family;
       if (elen < sizeof(ss_family)) {

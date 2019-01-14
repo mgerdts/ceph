@@ -19,6 +19,8 @@
 #include <fcntl.h>
 #endif
 
+#include <stdlib.h>
+
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -31,9 +33,15 @@
 #include "include/uuid.h"
 #include "include/stringify.h"
 #include "blkdev.h"
+#ifndef __sun__
 #include "numa.h"
+#endif
 
 #include "json_spirit/json_spirit_reader.h"
+
+#ifdef __sun__
+#define O_DIRECTORY 0
+#endif
 
 int get_device_by_path(const char *path, char* partition, char* device,
 		       size_t max)
@@ -85,6 +93,7 @@ BlkDev::BlkDev(const std::string& devname)
 
 int BlkDev::get_devid(dev_t *id) const
 {
+#if 0
   struct stat st;
   int r;
   if (fd >= 0) {
@@ -98,6 +107,9 @@ int BlkDev::get_devid(dev_t *id) const
     return -errno;
   }
   *id = S_ISBLK(st.st_mode) ? st.st_rdev : st.st_dev;
+#else
+  abort();
+#endif
   return 0;
 }
 
@@ -1084,17 +1096,17 @@ bool BlkDev::support_discard() const
   return false;
 }
 
-int BlkDev::discard(int fd, int64_t offset, int64_t len) const
+int BlkDev::discard(int64_t offset, int64_t len) const
 {
   return -EOPNOTSUPP;
 }
 
-bool BlkDev::is_nvme(const char *devname) const
+bool BlkDev::is_nvme() const
 {
   return false;
 }
 
-bool BlkDev::is_rotational(const char *devname) const
+bool BlkDev::is_rotational() const
 {
   return false;
 }
