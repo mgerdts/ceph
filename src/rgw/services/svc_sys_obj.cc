@@ -1,3 +1,10 @@
+#ifdef __sun__
+struct bogus_map;
+#define map bogus_map
+#include <net/if.h>
+#undef map
+#endif
+
 #include "svc_sys_obj.h"
 #include "svc_sys_obj_core.h"
 #include "svc_rados.h"

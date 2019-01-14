@@ -7843,9 +7843,11 @@ void Client::fill_dirent(struct dirent *de, const char *name, int type, uint64_t
   de->d_off = next_off;
 #endif
   de->d_reclen = 1;
+#ifndef __sun__
   de->d_type = IFTODT(type);
   ldout(cct, 10) << __func__ << " '" << de->d_name << "' -> " << inodeno_t(de->d_ino)
 	   << " type " << (int)de->d_type << " w/ next_off " << hex << next_off << dec << dendl;
+#endif
 #endif
 }
 

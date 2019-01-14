@@ -15,6 +15,19 @@
 #ifndef CEPH_ASYNC_BIND_HANDLER_H
 #define CEPH_ASYNC_BIND_HANDLER_H
 
+/*
+ * boost ends up including asio/detail/socket_types.hpp which includes
+ * <net/if.h>.  if.h has a structure that has a "struct map" member which has
+ * namespace conflicts with std::map.  That "struct map" has a namespace
+ * conflict with std::map.
+ */
+#ifdef __sun__
+struct renamed_map;
+#define map renamed_map
+#include <net/if.h>
+#undef map
+#endif
+
 #include <tuple>
 #include <boost/asio.hpp>
 
