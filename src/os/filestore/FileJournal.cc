@@ -41,6 +41,10 @@
 #define O_DSYNC O_SYNC
 #endif
 
+#ifndef O_DIRECT
+#define O_DIRECT 0x0
+#endif
+
 #define dout_context cct
 #define dout_subsys ceph_subsys_journal
 #undef dout_prefix

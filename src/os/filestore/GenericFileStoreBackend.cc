@@ -318,7 +318,7 @@ int GenericFileStoreBackend::do_fiemap(int fd, off_t start, size_t len, struct f
   fiemap->fm_length = len + start % CEPH_PAGE_SIZE;
   fiemap->fm_flags = FIEMAP_FLAG_SYNC; /* flush extents to disk if needed */
 
-#if defined(__APPLE__) || defined(__FreeBSD__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__sun__)
   ret = -ENOTSUP;
   goto done_err;
 #else
@@ -342,7 +342,7 @@ int GenericFileStoreBackend::do_fiemap(int fd, off_t start, size_t len, struct f
   fiemap->fm_extent_count = fiemap->fm_mapped_extents;
   fiemap->fm_mapped_extents = 0;
 
-#if defined(__APPLE__) || defined(__FreeBSD__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__sun__)
   ret = -ENOTSUP;
   goto done_err;
 #else

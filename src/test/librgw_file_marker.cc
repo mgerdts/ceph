@@ -31,6 +31,10 @@
 
 #define dout_subsys ceph_subsys_rgw
 
+#ifdef __sun__
+#define dirent_t ceph_test_dirent_t
+#endif
+
 namespace {
 
   using namespace rgw;

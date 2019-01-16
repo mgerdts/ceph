@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__sun__)
 #include <sys/wait.h>
 #endif 
 

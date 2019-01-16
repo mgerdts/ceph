@@ -31,6 +31,50 @@
 #include <linux/falloc.h>
 #endif
 
+#ifdef __sun__
+#include <sys/types.h>
+#include <sys/statvfs.h>
+
+struct statfs {
+  fsblkcnt_t f_blocks;
+  fsblkcnt_t f_bfree;
+  fsblkcnt_t f_bavail;
+  uint64_t f_bsize;
+  uint64_t f_type;
+};
+
+static void
+vfstofs(const struct statvfs *vfs, struct statfs *fs)
+{
+  fs->f_blocks = vfs->f_blocks;
+  fs->f_bfree = vfs->f_bfree;
+  fs->f_bavail = vfs->f_bavail;
+  fs->f_bsize = vfs->f_bsize;
+  fs->f_type = 0;	// XXX-mg translate vfs->f_str?
+}
+int
+statfs(const char *path, struct statfs *buf)
+{
+  int err;
+  struct statvfs vfs;
+  if ((err = statvfs(path, &vfs)) == 0) {
+    vfstofs(&vfs, buf);
+  }
+  return (err);
+}
+
+int
+fstatfs(int fd, struct statfs *buf)
+{
+  int err;
+  struct statvfs vfs;
+  if ((err = fstatvfs(fd, &vfs)) == 0) {
+    vfstofs(&vfs, buf);
+  }
+  return (err);
+}
+#endif
+
 #include <iostream>
 #include <map>
 
@@ -4944,7 +4988,9 @@ int FileStore::list_collections(vector<coll_t>& ls, bool include_temp)
 
   struct dirent *de = nullptr;
   while ((de = ::readdir(dir))) {
+#ifndef __sun__
     if (de->d_type == DT_UNKNOWN) {
+#endif
       // d_type not supported (non-ext[234], btrfs), must stat
       struct stat sb;
       char filename[PATH_MAX];
@@ -4964,9 +5010,11 @@ int FileStore::list_collections(vector<coll_t>& ls, bool include_temp)
       if (!S_ISDIR(sb.st_mode)) {
 	continue;
       }
+#ifndef __sun__
     } else if (de->d_type != DT_DIR) {
       continue;
     }
+#endif
     if (strcmp(de->d_name, "omap") == 0) {
       continue;
     }

@@ -29,7 +29,7 @@
 #include "XFS.h"
 #endif
 
-#if defined(__APPLE__) || defined(__FreeBSD__)
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__sun__)
 #include <sys/mount.h>
 #else
 #include <sys/vfs.h>
@@ -52,9 +52,13 @@ FS *FS::create(uint64_t f_type)
 
 FS *FS::create_by_fd(int fd)
 {
+#ifdef __sun__
+  return new FS;
+#else
   struct statfs st;
   ::fstatfs(fd, &st);
   return create(st.f_type);
+#endif
 }
 
 // ---------------

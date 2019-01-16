@@ -719,12 +719,14 @@ namespace librbd {
                io_ctx.get_id());
 
     int r = librbd::api::Image<>::list_images(io_ctx, images);
+#ifdef WITH_LTTNG
     if (r >= 0) {
       for (auto& it : *images) {
         tracepoint(librbd, list_entry, it.name.c_str());
       }
     }
     tracepoint(librbd, list_exit, r, r);
+#endif
     return r;
   }
 
@@ -1774,6 +1776,7 @@ namespace librbd {
                ictx->snap_name.c_str(), ictx->read_only);
 
     int r = librbd::api::Image<>::list_children(ictx, images);
+#ifdef WITH_LTTNG
     if (r >= 0) {
       for (auto& it : *images) {
         tracepoint(librbd, list_children_entry, it.pool_name.c_str(),
@@ -1782,6 +1785,7 @@ namespace librbd {
     }
 
     tracepoint(librbd, list_children_exit, r);
+#endif
     return r;
   }
 
@@ -2556,12 +2560,14 @@ namespace librbd {
     ImageCtx *ictx = (ImageCtx *)ctx;
     tracepoint(librbd, list_watchers_enter, ictx, ictx->name.c_str(), ictx->snap_name.c_str(), ictx->read_only);
     int r = librbd::list_watchers(ictx, watchers);
+#ifdef WITH_LTTNG
     if (r >= 0) {
       for (auto &watcher : watchers) {
 	tracepoint(librbd, list_watchers_entry, watcher.addr.c_str(), watcher.id, watcher.cookie);
       }
     }
     tracepoint(librbd, list_watchers_exit, r, watchers.size());
+#endif
     return r;
   }
 

@@ -1,5 +1,7 @@
 #include "include/buffer.h"
+#ifndef __sun__
 #include "include/encoding.h"
+#endif
 
 #include "gtest/gtest.h"
 
@@ -15,6 +17,7 @@ static void test_encode_and_decode(const T& src)
   decode(dst, i);
   ASSERT_EQ(src, dst) << "Encoding roundtrip changed the string: orig=" << src << ", but new=" << dst;
 }
+#ifndef __sun__
 
 TEST(EncodingRoundTrip, StringSimple) {
   string my_str("I am the very model of a modern major general");
@@ -64,7 +67,6 @@ TEST(EncodingRoundTrip, BufferListNoHead) {
   test_encode_and_nohead_nohead(static_cast<__u32>(size), bl);
   test_encode_and_nohead_nohead(static_cast<size_t>(size), bl);
 }
-
 typedef std::multimap < int, std::string > multimap_t;
 typedef multimap_t::value_type my_val_ty;
 
@@ -539,3 +541,4 @@ TEST(small_encoding, lba) {
   }
 
 }
+#endif // __sun__

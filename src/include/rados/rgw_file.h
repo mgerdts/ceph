@@ -339,6 +339,9 @@ struct rgw_vio {
   int32_t vio_len;
 };
   
+#ifdef uio_offset
+#undef uio_offset
+#endif
 struct rgw_uio {
   rgw_uio_release uio_rele;
   void *uio_p1;

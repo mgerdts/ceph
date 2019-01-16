@@ -60,7 +60,9 @@
 #include "common/ceph_argparse.h"
 #include "common/perf_counters.h"
 #include "common/strtol.h"
+#ifndef __sun__
 #include "common/numa.h"
+#endif
 
 #include "common/config.h"
 #include "common/errno.h"
@@ -4481,6 +4483,7 @@ bool OSDMonitor::handle_osd_timeouts(const utime_t &now,
   return new_down;
 }
 
+#ifndef __sun__
 static void dump_cpu_list(Formatter *f, const char *name,
 			  const string& strlist)
 {
@@ -4496,6 +4499,7 @@ static void dump_cpu_list(Formatter *f, const char *name,
   }
   f->close_section();
 }
+#endif
 
 void OSDMonitor::dump_info(Formatter *f)
 {
@@ -4944,12 +4948,14 @@ bool OSDMonitor::preprocess_command(MonOpRequestRef op)
 	      f->close_section();
 	    }
 	  }
+#ifndef __sun__
 	  for (auto n : { "numa_node_cpus" }) {
 	    p = m.find(n);
 	    if (p != m.end()) {
 	      dump_cpu_list(f.get(), n, p->second);
 	    }
 	  }
+#endif
 	  f->close_section();
 	} else {
 	  tbl << i;

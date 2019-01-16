@@ -33,6 +33,10 @@
 #include <sys/mount.h>
 #endif
 
+#ifdef __sun__
+#include <sys/loadavg.h>
+#endif
+
 #include "osd/PG.h"
 
 #include "include/types.h"
@@ -50,7 +54,9 @@
 #include "common/version.h"
 #include "common/pick_address.h"
 #include "common/blkdev.h"
+#ifndef __sun__
 #include "common/numa.h"
+#endif
 
 #include "os/ObjectStore.h"
 #ifdef HAVE_LIBFUSE
@@ -2239,6 +2245,9 @@ int OSD::pre_init()
 
 int OSD::set_numa_affinity()
 {
+#ifdef __sun__
+  dout(1) << __func__ << " not setting numa affinity (not supported)" << dendl;
+#else
   // storage numa node
   int store_node = -1;
   store->get_numa_node(&store_node, nullptr, nullptr);
@@ -2303,6 +2312,7 @@ int OSD::set_numa_affinity()
   } else {
     dout(1) << __func__ << " not setting numa affinity" << dendl;
   }
+#endif // __sun__
   return 0;
 }
 
@@ -5894,11 +5904,16 @@ void OSD::_collect_metadata(map<string,string> *pm)
     }
   }
 
+#ifdef __sun__
+  (*pm)["numa_node"] = "not supported";
+  (*pm)["numa_node_cpus"] = "not supported";
+#else
   if (numa_node >= 0) {
     (*pm)["numa_node"] = stringify(numa_node);
     (*pm)["numa_node_cpus"] = cpu_set_to_str_list(numa_cpu_set_size,
 						  &numa_cpu_set);
   }
+#endif
 
   set<string> devnames;
   store->get_devices(&devnames);

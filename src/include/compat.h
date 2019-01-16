@@ -60,8 +60,11 @@
 #undef ENODATA
 #endif
 #define ENODATA ENOATTR
+#endif	// __APPLE__ or __FreeBSD__
 
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__sun__)
 // Fix clock accuracy
+// XXX-mg I dealt with this elsewhere, which was probably wrong.
 #if !defined(CLOCK_MONOTONIC_COARSE)
 #if defined(CLOCK_MONOTONIC_FAST)
 #define CLOCK_MONOTONIC_COARSE CLOCK_MONOTONIC_FAST
@@ -98,7 +101,7 @@
 #endif
 #endif
 
-#endif /* __APPLE__ */
+#endif /* __APPLE__ or __FreeBSD__ or __sun__ */
 
 /* O_LARGEFILE is not defined/required on OSX/FreeBSD */
 #ifndef O_LARGEFILE

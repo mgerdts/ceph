@@ -33,6 +33,11 @@
 #include <limits>
 #include <vector>
 
+#ifdef __sun__
+#include <sched.h>
+#include <thread.h>
+#endif
+
 using std::ostringstream;
 using std::string;
 
@@ -40,6 +45,8 @@ static pid_t do_gettid(void)
 {
 #if defined(__linux__)
   return static_cast < pid_t >(syscall(SYS_gettid));
+#elif defined(__sun__)
+  return static_cast < pid_t >(thr_self());
 #else
   return static_cast < pid_t >(pthread_getthreadid_np());
 #endif

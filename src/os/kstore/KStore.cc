@@ -32,6 +32,44 @@
 #include "common/safe_io.h"
 #include "common/Formatter.h"
 
+#if defined(__linux__)
+#include <linux/fs.h>
+#include <linux/falloc.h>
+#endif
+
+#ifdef __sun__
+#define O_DIRECTORY (0)
+#include <sys/types.h>
+#include <sys/statvfs.h>
+
+struct statfs {
+  fsblkcnt_t f_blocks;
+  fsblkcnt_t f_bfree;
+  fsblkcnt_t f_bavail;
+  uint64_t f_bsize;
+  uint64_t f_type;
+};
+
+static void
+vfstofs(const struct statvfs *vfs, struct statfs *fs)
+{
+  fs->f_blocks = vfs->f_blocks;
+  fs->f_bfree = vfs->f_bfree;
+  fs->f_bavail = vfs->f_bavail;
+  fs->f_bsize = vfs->f_bsize;
+  fs->f_type = 0;	// XXX-mg translate vfs->f_str?
+}
+static int
+statfs(const char *path, struct statfs *buf)
+{
+  int err;
+  struct statvfs vfs;
+  if ((err = statvfs(path, &vfs)) == 0) {
+    vfstofs(&vfs, buf);
+  }
+  return (err);
+}
+#endif
 
 #define dout_context cct
 #define dout_subsys ceph_subsys_kstore

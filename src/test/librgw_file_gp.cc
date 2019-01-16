@@ -28,6 +28,14 @@
 #include "common/debug.h"
 #include "global/global_init.h"
 
+#ifdef __sun__
+# include <alloca.h>
+# ifdef uio_offset
+#  undef uio_offset
+# endif
+# define uio ceph_test_uio
+#endif
+
 #define dout_context g_ceph_context
 #define dout_subsys ceph_subsys_rgw
 

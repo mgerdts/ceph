@@ -35,7 +35,9 @@
 #include "common/Timer.h"
 #include "common/TracepointProvider.h"
 #include "common/ceph_argparse.h"
+#ifndef __sun__
 #include "common/numa.h"
+#endif
 
 #include "global/global_init.h"
 #include "global/signal_handler.h"
@@ -472,6 +474,9 @@ flushjournal_out:
     forker.exit(0);
   }
 
+#ifdef __sun__
+  int iface_preferred_numa_node = -1;
+#else
   // consider objectstore numa node
   int os_numa_node = -1;
   r = store->get_numa_node(&os_numa_node, nullptr, nullptr);
@@ -482,6 +487,7 @@ flushjournal_out:
   if (g_conf().get_val<bool>("osd_numa_prefer_iface")) {
     iface_preferred_numa_node = os_numa_node;
   }
+#endif
 
   // messengers
   std::string msg_type = g_conf().get_val<std::string>("ms_type");
